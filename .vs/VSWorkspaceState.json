@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Shoes",
+    "\\Shoes\\App_Start",
+    "\\Shoes\\Controllers",
+    "\\Shoes\\Scripts",
+    "\\Shoes\\ViewModels",
+    "\\Shoes\\Views",
+    "\\Shoes\\Views\\Home",
+    "\\Shoes\\Views\\Stock"
+  ],
+  "SelectedNode": "\\Shoes\\Views\\Stock\\Index.cshtml",
+  "PreviewInSolutionExplorer": false
+}

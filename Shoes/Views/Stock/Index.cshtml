@@ -1,0 +1,21 @@
+﻿@model Shoes.ViewModels.StockViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Index</h2>
+
+@foreach (Shoes.Models.Shoe shoe in Model.Shoes)
+{
+    <div>
+        <div class="card bg-dark" style="width: 18rem;">
+            <img class="d-block mx-auto" src="data:image/png;base64, @Convert.ToBase64String(Model.Images.FirstOrDefault(i => i.ShoeId == shoe.Id).RawImage)" alt="">
+            <div class="card-body">
+                <h5 class="card-title">@shoe.Name</h5>
+                <p class="card-text">@shoe.Description</p>
+                @Html.ActionLink("Edit", "Edit", "Stock", new { Id = shoe.Id }, new { @class = "btn btn-info"})
+            </div>
+        </div>
+    </div>
+}
