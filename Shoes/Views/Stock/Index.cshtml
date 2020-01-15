@@ -4,18 +4,26 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h2>Index</h2>
+<p>
+    <h2>Index</h2>
+    @Html.ActionLink("New", "Edit/0", "Stock", new { }, new { @class = "btn btn-primary"})
+</p>
 
-@foreach (Shoes.Models.Shoe shoe in Model.Shoes)
-{
-    <div>
-        <div class="card bg-dark" style="width: 18rem;">
-            <img class="d-block mx-auto" src="data:image/png;base64, @Convert.ToBase64String(Model.Images.FirstOrDefault(i => i.ShoeId == shoe.Id).RawImage)" alt="">
-            <div class="card-body">
-                <h5 class="card-title">@shoe.Name</h5>
-                <p class="card-text">@shoe.Description</p>
-                @Html.ActionLink("Edit", "Edit", "Stock", new { Id = shoe.Id }, new { @class = "btn btn-info"})
+<div class="row">
+    @foreach (Shoes.Models.Shoe shoe in Model.Shoes)
+    {
+        if (shoe.IsEnabled)
+        {
+            <div class="col-3">
+                <div class="card bg-dark" style="width: 18rem;">
+                    <img class="d-block mx-auto" src="data:image/png;base64, @Convert.ToBase64String(Model.Images.FirstOrDefault(i => i.ShoeId == shoe.Id).RawImage)" alt="">
+                    <div class="card-body">
+                        <h5 class="card-title">@shoe.Name</h5>
+                        <p class="card-text">@shoe.Description</p>
+                        @Html.ActionLink("Edit", "Edit", "Stock", new { Id = shoe.Id }, new { @class = "btn btn-info" })
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-}
+        }
+    }
+</div>

@@ -3,6 +3,7 @@ using Shoes.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Data.Entity.Validation;
 using System.IO;
 using System.Linq;
 using System.Web;
@@ -42,15 +43,29 @@ namespace Shoes.Controllers
                 Shoe = _context.Shoes.FirstOrDefault(s => s.Id == Id),
                 Images = _context.Images.Where(i => i.ShoeId == Id).ToList()
             };
+
             if (viewModel.Shoe != null)
                 return View("ShoesForm", viewModel);
-            return HttpNotFound();
+
+            return View("ShoesForm", new ShoesFormViewModel());
         }
 
+        [HttpPost]
         public ActionResult Save(Shoe shoe)
         {
             if(shoe.Id == 0)
+            {
                 _context.Shoes.Add(shoe);
+                _context.SaveChanges();
+                shoe.Id = _context.Shoes.OrderByDescending(s => s.Id).First().Id;
+                _context.Images.Add(new Image
+                {
+                    RawImage = _context.Images.First(i => i.Id == 5).RawImage,
+                    ColorHex = "",
+                    ShoeId = shoe.Id,
+                });
+                _context.SaveChanges();
+            }
             else
             {
                 var shoeInDb = _context.Shoes.First(s => s.Id == shoe.Id);
@@ -59,27 +74,35 @@ namespace Shoes.Controllers
                 shoeInDb.Price = shoe.Price;
                 shoeInDb.Updated = shoe.Updated;
                 shoeInDb.IsEnabled = shoe.IsEnabled;
+                _context.SaveChanges();
             }
-            _context.SaveChanges();
-            return RedirectToAction("Index", "Stock");
+            return RedirectToAction("Edit/" + shoe.Id, "Stock");
         }
 
         [HttpPost]
-        public ActionResult AddImage(Shoe shoe, HttpPostedFileBase file)
+        public ActionResult AddImage(HttpPostedFileBase file, Shoe shoe)
         {
-            byte[] rawImg;
-            using (BinaryReader br = new BinaryReader(file.InputStream))
+            try
             {
-                rawImg = br.ReadBytes(file.ContentLength);
+                byte[] rawImg;
+                using (BinaryReader br = new BinaryReader(file.InputStream))
+                {
+                    rawImg = br.ReadBytes(file.ContentLength);
+                }
+                _context.Images.Add(new Image
+                {
+                    RawImage = rawImg,
+                    ColorHex = "",
+                    ShoeId = shoe.Id,
+                    Shoe = _context.Shoes.First(s => s.Id == shoe.Id)                    
+                });
+                _context.SaveChanges();
+            }catch (DbEntityValidationException e)
+            {
+                var ex = e;
             }
-            _context.Images.Add(new Image
-            {
-                RawImage = rawImg,
-                ColorHex = "",
-                ShoeId = 1//viewModel.Shoe.Id
-            });
 
-            return RedirectToAction("Stock/Edit/" + 1 /*viewModel.Shoe.Id*/, "Stock");
+            return RedirectToAction("Edit/" + shoe.Id, "Stock");
         }
     }
 }
